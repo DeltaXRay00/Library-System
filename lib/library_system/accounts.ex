@@ -5,7 +5,6 @@ defmodule LibrarySystem.Accounts do
 
   import Ecto.Query, warn: false
   alias LibrarySystem.Repo
-
   alias LibrarySystem.Accounts.User
 
   @doc """
@@ -36,6 +35,14 @@ defmodule LibrarySystem.Accounts do
 
   """
   def get_user!(id), do: Repo.get!(User, id)
+
+  def get_user_with_loans!(id) do
+    LibrarySystem.Accounts.User
+    |> Repo.get!(id)
+    |> Repo.preload(loans: [:book])
+  end
+
+
 
   @doc """
   Creates a user.

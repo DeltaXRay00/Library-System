@@ -13,6 +13,22 @@
   <:item title="Age">{@user.age}</:item>
 </.list>
 
+<%= if Enum.any?(@user.loans) do %>
+  <h3 class="mt-4 text-lg font-semibold">Borrowed Books</h3>
+  <ul class="list-disc pl-6">
+    <%= for loan <- @user.loans do %>
+      <li class="mb-2">
+        <strong>Book:</strong> <%= loan.book.title %><br/>
+        <strong>Borrowed at:</strong> <%= loan.borrowed_at %><br/>
+        <strong>Due at:</strong> <%= loan.due_at %><br/>
+        <strong>Returned at:</strong> <%= loan.returned_at || "Not returned yet" %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>This user has no borrowed books.</p>
+<% end %>
+
 <.back navigate={~p"/users"}>Back to users</.back>
 
 <.modal :if={@live_action == :edit} id="user-modal" show on_cancel={JS.patch(~p"/users/#{@user}")}>
