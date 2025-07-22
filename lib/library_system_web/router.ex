@@ -21,25 +21,36 @@ defmodule LibrarySystemWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-    live "/users", UserLive.Index, :index
-    live "/users/new", UserLive.Index, :new
-    live "/users/:id/edit", UserLive.Index, :edit
-    live "/users/:id", UserLive.Show, :show
-    live "/users/:id/show/edit", UserLive.Show, :edit
+  end
 
-    live "/books", BookLive.Index, :index
-    live "/books/new", BookLive.Index, :new
-    live "/books/:id/edit", BookLive.Index, :edit
+  scope "/", LibrarySystemWeb do
+    pipe_through [:browser, :require_authenticated_credential]
 
-    live "/books/:id", BookLive.Show, :show
-    live "/books/:id/show/edit", BookLive.Show, :edit
+    live_session :require_authenticated_credential,
+      on_mount: [{LibrarySystemWeb.CredentialAuth, :ensure_authenticated}] do
+      # User, Book, Loan pages
+      live "/users", UserLive.Index, :index
+      live "/users/new", UserLive.Index, :new
+      live "/users/:id/edit", UserLive.Index, :edit
+      live "/users/:id", UserLive.Show, :show
+      live "/users/:id/show/edit", UserLive.Show, :edit
 
-    live "/loans", LoanLive.Index, :index
-    live "/loans/new", LoanLive.Index, :new
-    live "/loans/:id/edit", LoanLive.Index, :edit
+      live "/books", BookLive.Index, :index
+      live "/books/new", BookLive.Index, :new
+      live "/books/:id/edit", BookLive.Index, :edit
+      live "/books/:id", BookLive.Show, :show
+      live "/books/:id/show/edit", BookLive.Show, :edit
 
-    live "/loans/:id", LoanLive.Show, :show
-    live "/loans/:id/show/edit", LoanLive.Show, :edit
+      live "/loans", LoanLive.Index, :index
+      live "/loans/new", LoanLive.Index, :new
+      live "/loans/:id/edit", LoanLive.Index, :edit
+      live "/loans/:id", LoanLive.Show, :show
+      live "/loans/:id/show/edit", LoanLive.Show, :edit
+
+      # Profile settings pages
+      live "/profiles/settings", CredentialSettingsLive, :edit
+      live "/profiles/settings/confirm_email/:token", CredentialSettingsLive, :confirm_email
+    end
   end
 
   # Other scopes may use custom stacks.
@@ -78,16 +89,6 @@ defmodule LibrarySystemWeb.Router do
     end
 
     post "/profiles/log_in", CredentialSessionController, :create
-  end
-
-  scope "/", LibrarySystemWeb do
-    pipe_through [:browser, :require_authenticated_credential]
-
-    live_session :require_authenticated_credential,
-      on_mount: [{LibrarySystemWeb.CredentialAuth, :ensure_authenticated}] do
-      live "/profiles/settings", CredentialSettingsLive, :edit
-      live "/profiles/settings/confirm_email/:token", CredentialSettingsLive, :confirm_email
-    end
   end
 
   scope "/", LibrarySystemWeb do
