@@ -33,6 +33,9 @@ defmodule LibrarySystemWeb.CredentialRegistrationLive do
 
         <.input field={@form[:email]} type="email" label="Email" required />
         <.input field={@form[:password]} type="password" label="Password" required />
+        <.input field={@form[:full_name]} type="text" label="Full Name" required />
+        <.input field={@form[:phone_number]} type="text" label="Phone Number" required />
+        <.input field={@form[:identity_card_number]} type="text" label="Identity Card Number" required />
 
         <:actions>
           <.button phx-disable-with="Creating account..." class="w-full">Create an account</.button>
@@ -50,7 +53,7 @@ defmodule LibrarySystemWeb.CredentialRegistrationLive do
       |> assign(trigger_submit: false, check_errors: false)
       |> assign_form(changeset)
 
-    {:ok, socket, temporary_assigns: [form: nil]}
+    {:ok, socket}
   end
 
   def handle_event("save", %{"credential" => credential_params}, socket) do

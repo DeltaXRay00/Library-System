@@ -8,6 +8,10 @@ defmodule LibrarySystem.Credentials.Credential do
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
+    field :full_name, :string
+    field :phone_number, :string
+    field :identity_card_number, :string
+    field :gender, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -37,7 +41,8 @@ defmodule LibrarySystem.Credentials.Credential do
   """
   def registration_changeset(credential, attrs, opts \\ []) do
     credential
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :full_name, :phone_number, :identity_card_number])
+    |> validate_required([:email, :password, :full_name, :phone_number, :identity_card_number])
     |> validate_email(opts)
     |> validate_password(opts)
   end
@@ -118,6 +123,15 @@ defmodule LibrarySystem.Credentials.Credential do
     |> cast(attrs, [:password])
     |> validate_confirmation(:password, message: "does not match password")
     |> validate_password(opts)
+  end
+
+  @doc """
+  A credential changeset for updating profile fields.
+  """
+  def profile_changeset(credential, attrs) do
+    credential
+    |> cast(attrs, [:full_name, :gender, :phone_number, :identity_card_number])
+    |> validate_required([:full_name, :gender, :phone_number, :identity_card_number])
   end
 
   @doc """

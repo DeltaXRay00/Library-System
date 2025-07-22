@@ -69,6 +69,22 @@ defmodule LibrarySystemWeb.CredentialSettingsLive do
           </:actions>
         </.simple_form>
       </div>
+      <div>
+        <.simple_form
+          for={@profile_form}
+          id="profile_form"
+          phx-submit="update_profile"
+          phx-change="validate_profile"
+        >
+          <.input field={@profile_form[:full_name]} type="text" label="Full Name" required />
+          <.input field={@profile_form[:gender]} type="select" label="Gender" options={[{"Male", "male"}, {"Female", "female"}, {"Other", "other"}]} required />
+          <.input field={@profile_form[:phone_number]} type="text" label="Phone Number" required />
+          <.input field={@profile_form[:identity_card_number]} type="text" label="Identity Card Number" required />
+          <:actions>
+            <.button phx-disable-with="Saving...">Update Profile</.button>
+          </:actions>
+        </.simple_form>
+      </div>
     </div>
     """
   end
@@ -90,6 +106,7 @@ defmodule LibrarySystemWeb.CredentialSettingsLive do
     credential = socket.assigns.current_credential
     email_changeset = Credentials.change_credential_email(credential)
     password_changeset = Credentials.change_credential_password(credential)
+    profile_changeset = Credentials.profile_changeset(credential, %{})
 
     socket =
       socket
@@ -98,6 +115,7 @@ defmodule LibrarySystemWeb.CredentialSettingsLive do
       |> assign(:current_email, credential.email)
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
+      |> assign(:profile_form, to_form(profile_changeset))
       |> assign(:trigger_submit, false)
 
     {:ok, socket}
@@ -162,6 +180,23 @@ defmodule LibrarySystemWeb.CredentialSettingsLive do
 
       {:error, changeset} ->
         {:noreply, assign(socket, password_form: to_form(changeset))}
+    end
+  end
+
+  def handle_event("validate_profile", %{"credential" => profile_params}, socket) do
+    changeset = Credentials.profile_changeset(socket.assigns.current_credential, profile_params)
+    {:noreply, assign(socket, profile_form: to_form(Map.put(changeset, :action, :validate)))}
+  end
+
+  def handle_event("update_profile", %{"credential" => profile_params}, socket) do
+    credential = socket.assigns.current_credential
+    changeset = Credentials.profile_changeset(credential, profile_params)
+
+    case LibrarySystem.Repo.update(changeset) do
+      {:ok, _updated_credential} ->
+        {:noreply, socket |> put_flash(:info, "Profile updated successfully.")}
+      {:error, changeset} ->
+        {:noreply, assign(socket, profile_form: to_form(changeset))}
     end
   end
 end

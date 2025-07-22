@@ -350,4 +350,11 @@ defmodule LibrarySystem.Credentials do
       {:error, :credential, changeset, _} -> {:error, changeset}
     end
   end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for updating profile fields.
+  """
+  def profile_changeset(%Credential{} = credential, attrs \\ %{}) do
+    Credential.profile_changeset(credential, attrs)
+  end
 end
